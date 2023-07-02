@@ -1,4 +1,8 @@
+package imageProcessing;
+
+import graphs.PlaneVertex;
 import org.opencv.core.Core;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.features2d.FastFeatureDetector;
@@ -6,9 +10,16 @@ import org.opencv.features2d.Features2d;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ImageProcessing {
 
     public static void main(String[] args) {
+        generateKeypointsList();
+    }
+
+    public static List<PlaneVertex> generateKeypointsList() {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // ------------------------ EDGE DETECTION ------------------------
@@ -58,5 +69,24 @@ public class ImageProcessing {
 
         // Save the marked keypoints image
         Imgcodecs.imwrite("img/keypoints.png", outputImage);
+
+        // ------------------------ KEYPOINTS LIST ------------------------
+
+        List<PlaneVertex> vertices = new ArrayList<>();
+        List<KeyPoint> keyPointsList = keypoints.toList();
+        List<KeyPoint> linepointsList = linepoints.toList();
+
+        int id = 0;
+
+        for (KeyPoint keyPoint : keyPointsList) {
+            vertices.add(new PlaneVertex(id, (int) keyPoint.pt.x, (int) keyPoint.pt.y));
+            id++;
+        }
+
+        for (KeyPoint linePoint : linepointsList) {
+            vertices.add(new PlaneVertex(id, (int) linePoint.pt.x, (int) linePoint.pt.y));
+        }
+
+        return vertices;
     }
 }

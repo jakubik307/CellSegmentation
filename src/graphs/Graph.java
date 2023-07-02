@@ -1,19 +1,11 @@
-package Graphs;
+package graphs;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class Graph {
-    private static final int MIN_VERTICES = 1;
-    private static final int MAX_VERTICES = 10;
-    private static final int MIN_WEIGHT = 1;
-    private static final int MAX_WEIGHT = 20;
-    private static final double EDGE_PROBABILITY = 0.5;
-
     protected Map<Vertex, List<Edge>> adjacencyMap;
     protected List<Edge> edges;
-
-    protected Vertex startVertex;
-    protected Vertex endVertex;
 
     public Graph() {
         adjacencyMap = new HashMap<>();
@@ -38,45 +30,8 @@ public class Graph {
         return new ArrayList<>(adjacencyMap.keySet());
     }
 
-    public Vertex getStartVertex() {
-        return startVertex;
-    }
-
-    public Vertex getEndVertex() {
-        return endVertex;
-    }
-
     public List<Edge> getEdges() {
         return edges;
-    }
-
-    public void generateDijkstraGraph() {
-        Random random = new Random();
-        int numVertices = random.nextInt(MIN_VERTICES, MAX_VERTICES + 1);
-
-        for (int i = 1; i <= numVertices; i++) {
-            addVertex(i);
-        }
-
-        for (int i = 1; i <= numVertices; i++) {
-            for (int j = i + 1; j <= numVertices; j++) {
-                if (Math.random() <= EDGE_PROBABILITY) {
-                    int weight = random.nextInt(MIN_WEIGHT, MAX_WEIGHT + 1);
-                    addEdge(new Vertex(i), new Vertex(j), weight);
-                    addEdge(new Vertex(j), new Vertex(i), weight);
-                }
-            }
-        }
-
-        startVertex = new Vertex(random.nextInt(numVertices) + 1);
-        if (numVertices > 1)
-            do endVertex = new Vertex(random.nextInt(numVertices) + 1); while (startVertex.equals(endVertex));
-    }
-
-    public void generateGabrielGraph() {
-    }
-
-    public void generateRNGraph() {
     }
 
     public List<Cycle> findAllCycles() {

@@ -1,4 +1,4 @@
-package Graphs;
+package graphs;
 
 public class PlaneVertex extends Vertex{
     private final int x;
