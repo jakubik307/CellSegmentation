@@ -2,16 +2,20 @@ package View;
 
 import Graphs.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 import static Graphs.DijkstraAlgorithm.findShortestPath;
 
 public class GUI extends JFrame {
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 700;
+    public static int WIDTH = 600;
+    public static int HEIGHT = 700;
+    public static int BUTTON_PANEL_HEIGHT = 50;
 
     private Graph graph;
     private List<Vertex> vertices;
@@ -19,24 +23,37 @@ public class GUI extends JFrame {
 
     private int drawingOption = 0;
 
+    private BufferedImage backgroundImage;
+
     public GUI() {
+
+        loadBackgroundImage();
+        WIDTH = backgroundImage.getWidth();
+        HEIGHT = backgroundImage.getHeight();
+
+        setSize(new Dimension(WIDTH, HEIGHT + BUTTON_PANEL_HEIGHT));
+        setResizable(false);
+
         generateDijkstraGraph();
-        setTitle("Graphs");
-        setSize(WIDTH, HEIGHT);
+        setTitle("Cell Segmentation");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+
+        setLayout(new BorderLayout());
 
         JPanel graphPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                g.drawImage(backgroundImage, 0, 0, null);
                 switch (drawingOption) {
                     case 0 -> drawDijkstraGraph(g);
                     case 1 -> drawPlaneGraph(g);
                 }
             }
         };
-        graphPanel.setBackground(Color.WHITE);
+        graphPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        graphPanel.setOpaque(false);
         add(graphPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
@@ -73,6 +90,7 @@ public class GUI extends JFrame {
 
         add(buttonPanel, BorderLayout.SOUTH);
 
+        pack();
         setVisible(true);
     }
 
@@ -178,7 +196,7 @@ public class GUI extends JFrame {
 
                 g.fillOval(x - vertexRadius, y - vertexRadius, 2 * vertexRadius, 2 * vertexRadius);
                 g.setColor(Color.BLACK);
-                g.drawString(Integer.toString(id), x+5, y+5);
+                g.drawString(Integer.toString(id), x + 5, y + 5);
             }
         }
 
@@ -232,5 +250,14 @@ public class GUI extends JFrame {
         graph.generateGabrielGraph();
         vertices = graph.getVertices();
         shortestPath = findShortestPath(graph);
+    }
+
+    private void loadBackgroundImage() {
+        try {
+            File imageFile = new File("img/input.png");
+            backgroundImage = ImageIO.read(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
