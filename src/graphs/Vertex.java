@@ -2,6 +2,7 @@ package graphs;
 
 import java.util.Objects;
 
+@SuppressWarnings("unused")
 public class Vertex {
     private final int id;
 

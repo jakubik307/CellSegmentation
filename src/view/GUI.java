@@ -16,7 +16,7 @@ public class GUI extends JFrame {
 
     public static int WIDTH = 600;
     public static int HEIGHT = 700;
-    private Graph graph;
+    private PlaneGraph graph;
     private List<PlaneVertex> vertices;
 
     private BufferedImage backgroundImage;
@@ -81,7 +81,7 @@ public class GUI extends JFrame {
     private void showCycles() {
         // Tworzenie modelu listy
         JFrame listFrame = new JFrame("Cycle list");
-        listFrame.setPreferredSize(new Dimension(600, 600));
+        listFrame.setPreferredSize(new Dimension(500, 500));
         listFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         listFrame.setLocationRelativeTo(null);
 
@@ -114,13 +114,14 @@ public class GUI extends JFrame {
             int x = vertex.getX();
             int y = vertex.getY();
 
-            g.setColor(Color.RED);
+            // Vertex color
+            g.setColor(Color.GREEN);
 
             g.fillOval(x - vertexRadius, y - vertexRadius, 2 * vertexRadius, 2 * vertexRadius);
-            g.setColor(Color.BLACK);
         }
 
-        g.setColor(Color.BLACK);
+        // Edge color
+        g.setColor(Color.RED);
         List<Edge> edges = graph.getEdges();
 
         for (Edge edge : edges) {
@@ -157,6 +158,8 @@ public class GUI extends JFrame {
 
     private void generateGraph() {
         vertices = ImageProcessing.generateKeypointsList();
+        System.out.println(vertices.size());
         graph = new PlaneGraph(vertices);
+        graph.generateRNGraph();
     }
 }

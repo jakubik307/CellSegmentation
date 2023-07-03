@@ -1,7 +1,6 @@
 package graphs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -10,9 +9,11 @@ public class PlaneGraph extends Graph {
     private final List<PlaneVertex> vertices;
 
     public PlaneGraph(List<PlaneVertex> vertices) {
-        this.adjacencyMap = new HashMap<>();
-        this.edges = new ArrayList<>();
+        super();
         this.vertices = vertices;
+        for (PlaneVertex vertex : vertices) {
+            addVertex(vertex.getID(), vertex.getX(), vertex.getY());
+        }
     }
 
     public void generateGabrielGraph() {
@@ -73,9 +74,9 @@ public class PlaneGraph extends Graph {
         }
     }
 
-    private void addVertex(int i, int x, int y) {
-        PlaneVertex vertex = new PlaneVertex(i, x, y);
+    private void addVertex(int id, int x, int y) {
+        PlaneVertex vertex = new PlaneVertex(id, x, y);
         adjacencyMap.put(vertex, new ArrayList<>());
-        vertices.add(vertex);
+//        vertices.add(vertex);
     }
 }
