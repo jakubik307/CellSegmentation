@@ -5,19 +5,19 @@ import java.util.Objects;
 
 public class Cycle {
     private final List<Vertex> vertices;
-    private final int weight;
+    private final int size;
 
-    public Cycle(List<Vertex> vertices, int weight) {
+    public Cycle(List<Vertex> vertices) {
         this.vertices = vertices;
-        this.weight = weight;
+        this.size = vertices.size();
     }
 
     public List<Vertex> getVertices() {
         return vertices;
     }
 
-    public int getWeight() {
-        return weight;
+    public int getSize() {
+        return size;
     }
 
     @Override
@@ -70,6 +70,6 @@ public class Cycle {
 
     @Override
     public String toString() {
-        return "Cycle: " + vertices.toString() + "      Sum of weights: " + weight;
+        return "Cycle: " + vertices.toString() + "      Sum of weights: " + size;
     }
 }

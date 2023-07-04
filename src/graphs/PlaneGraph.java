@@ -38,8 +38,8 @@ public class PlaneGraph extends Graph {
                 }
 
                 if (isValidEdge) {
-                    addEdge(p1, p2, 1);
-                    addEdge(p2, p1, 1);
+                    addEdge(p1, p2);
+                    addEdge(p2, p1);
                 }
             }
         }
@@ -67,8 +67,8 @@ public class PlaneGraph extends Graph {
                 }
 
                 if (isValidEdge) {
-                    addEdge(p1, p2, 1);
-                    addEdge(p2, p1, 1);
+                    addEdge(p1, p2);
+                    addEdge(p2, p1);
                 }
             }
         }

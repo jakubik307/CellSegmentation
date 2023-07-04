@@ -28,7 +28,7 @@ public class GUI extends JFrame {
         HEIGHT = backgroundImage.getHeight();
 
         setSize(new Dimension(WIDTH, HEIGHT + BUTTON_PANEL_HEIGHT));
-        setResizable(false);
+//        setResizable(false);
 
         setTitle("Cell Segmentation");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,21 +49,21 @@ public class GUI extends JFrame {
         add(graphPanel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        JButton generateButton = new JButton("Graph on input");
-        generateButton.addActionListener(e -> {
+        JButton inputButton = new JButton("Graph on input");
+        inputButton.addActionListener(e -> {
             loadBackgroundImage();
 
             repaint();
         });
-        buttonPanel.add(generateButton);
+        buttonPanel.add(inputButton);
 
-        JButton rngButton = new JButton("Graph on edges");
-        rngButton.addActionListener(e -> {
+        JButton edgeButton = new JButton("Graph on edges");
+        edgeButton.addActionListener(e -> {
             loadEdgesImage();
 
             repaint();
         });
-        buttonPanel.add(rngButton);
+        buttonPanel.add(edgeButton);
 
         JButton cycleButton = new JButton("List of cycles");
         cycleButton.addActionListener(e -> {
@@ -87,7 +87,7 @@ public class GUI extends JFrame {
 
         // Tworzenie modelu listy
         DefaultListModel<String> model = new DefaultListModel<>();
-        List<Cycle> cycles = graph.findAllCycles();
+        List<Cycle> cycles = FastCycleDetection.enumerateCycles(graph);
         model.addElement("Found " + cycles.size() + " cycles");
         for (Cycle cycle : cycles) {
             model.addElement(cycle.toString());

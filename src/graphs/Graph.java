@@ -12,12 +12,16 @@ public class Graph {
         edges = new ArrayList<>();
     }
 
+    public Map<Vertex, List<Edge>> getAdjacencyMap() {
+        return adjacencyMap;
+    }
+
     private void addVertex(int i) {
         adjacencyMap.put(new Vertex(i), new ArrayList<>());
     }
 
-    public void addEdge(Vertex source, Vertex destination, int weight) {
-        Edge edge = new Edge(source, destination, weight);
+    public void addEdge(Vertex source, Vertex destination) {
+        Edge edge = new Edge(source, destination);
         adjacencyMap.get(source).add(edge);
         edges.add(edge);
     }
@@ -44,7 +48,7 @@ public class Graph {
             }
         }
         cycles = filterOutTwoNodeCycles(cycles);
-        cycles.sort(Comparator.comparingInt(Cycle::getWeight).reversed());
+        cycles.sort(Comparator.comparingInt(Cycle::getSize).reversed());
         return cycles;
     }
 
@@ -58,8 +62,7 @@ public class Graph {
             if (path.size() > 2 && neighbor.equals(path.get(0))) {
                 // Cykl został znaleziony
                 List<Vertex> cycle = new ArrayList<>(path);
-                int weight = calculateCycleWeight(cycle);
-                Cycle newCycle = new Cycle(cycle, weight);
+                Cycle newCycle = new Cycle(cycle);
                 if (!cycles.contains(newCycle)) {
                     cycles.add(newCycle);
                 }
@@ -80,20 +83,5 @@ public class Graph {
             }
         }
         return filteredCycles;
-    }
-
-    private int calculateCycleWeight(List<Vertex> cycle) {
-        int weightSum = 0;
-        for (int i = 0; i < cycle.size(); i++) {
-            Vertex source = cycle.get(i);
-            Vertex destination = cycle.get((i + 1) % cycle.size()); // Używamy modulo, aby uzyskać cykliczne połączenie ostatniego wierzchołka z pierwszym
-            for (Edge edge : adjacencyMap.get(source)) {
-                if (edge.destination().equals(destination)) {
-                    weightSum += edge.weight();
-                    break;
-                }
-            }
-        }
-        return weightSum;
     }
 }
