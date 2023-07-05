@@ -8,6 +8,7 @@ import org.jgrapht.graph.SimpleGraph;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public class TissueGraph {
     public static Graph<Point, DefaultEdge> generateRNGraph(List<Point> list) {
         Graph<Point, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
@@ -73,6 +74,7 @@ public class TissueGraph {
         return graph;
     }
 
+    @Deprecated
     public static List<List<Point>> getCyclesDFS(Graph<Point, DefaultEdge> graph) {
         List<List<Point>> allCycles = new ArrayList<>();
         Set<Point> vertices = graph.vertexSet();
@@ -109,7 +111,6 @@ public class TissueGraph {
     public static List<List<Point>> getCyclesPaton(Graph<Point, DefaultEdge> graph) {
         Set<List<Point>> allCycles = new HashSet<>();
         PatonCycleBase<Point, DefaultEdge> cycleBase = new PatonCycleBase<>(graph);
-        System.out.println(cycleBase.getCycleBasis().getCycles().size());
 
         cycleBase.getCycleBasis().getCycles().forEach(cycle -> {
             List<Point> currentCycle = new ArrayList<>();
@@ -123,7 +124,7 @@ public class TissueGraph {
         });
 
         List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
-        cycleList.sort(Comparator.comparing(List::size));
+        cycleList.sort((o1, o2) -> o2.size() - o1.size());
 
         return cycleList;
     }

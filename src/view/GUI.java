@@ -3,6 +3,7 @@ package view;
 import graphs.Point;
 import graphs.TissueGraph;
 import imageProcessing.ImageProcessing;
+import main.Main;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
@@ -12,28 +13,32 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class GUI extends JFrame {
     public final static int BUTTON_PANEL_HEIGHT = 50;
-
     public static int WIDTH = 600;
     public static int HEIGHT = 700;
+
     private Graph<Point, DefaultEdge> graph;
     private List<Point> vertices;
+    private List<List<Point>> cycles;
+    private List<Polygon> polygons;
+    private int cycleIndex = 0;
 
     private BufferedImage backgroundImage;
 
     public GUI() {
         generateGraph();
+        convertCyclesToPolygons();
 
         loadBackgroundImage();
         WIDTH = backgroundImage.getWidth();
         HEIGHT = backgroundImage.getHeight();
 
         setSize(new Dimension(WIDTH, HEIGHT + BUTTON_PANEL_HEIGHT));
-//        setResizable(false);
 
         setTitle("Cell Segmentation");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,6 +52,7 @@ public class GUI extends JFrame {
                 super.paintComponent(g);
                 g.drawImage(backgroundImage, 0, 0, null);
                 drawPlaneGraph(g);
+                drawCycle(g);
             }
         };
         graphPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -72,6 +78,13 @@ public class GUI extends JFrame {
         cycleButton.addActionListener(e -> showCycles());
         buttonPanel.add(cycleButton);
 
+        JButton nextCycleButton = new JButton("Show next cycle");
+        nextCycleButton.addActionListener(e -> {
+            cycleIndex++;
+            repaint();
+        });
+        buttonPanel.add(nextCycleButton);
+
         add(buttonPanel, BorderLayout.SOUTH);
 
         pack();
@@ -87,7 +100,6 @@ public class GUI extends JFrame {
 
         // Tworzenie modelu listy
         DefaultListModel<String> model = new DefaultListModel<>();
-        List<List<Point>> cycles = TissueGraph.getCyclesPaton(graph);
         model.addElement("Found " + cycles.size() + " cycles");
         for (List<Point> list : cycles) {
             StringBuilder builder = new StringBuilder();
@@ -141,6 +153,13 @@ public class GUI extends JFrame {
         }
     }
 
+    private void drawCycle(Graphics g) {
+        g.setColor(new Color(66, 117, 245, 150));
+        Polygon polygon = polygons.get(cycleIndex % polygons.size());
+        g.drawPolygon(polygon);
+        g.fillPolygon(polygon);
+    }
+
     private void loadBackgroundImage() {
         try {
             File imageFile = new File("img/input.png");
@@ -160,8 +179,26 @@ public class GUI extends JFrame {
     }
 
     private void generateGraph() {
-        vertices = ImageProcessing.generateKeypointsList();
+        this.vertices = ImageProcessing.generateKeypointsList();
+        this.graph = TissueGraph.generateRNGraph(vertices);
+        this.cycles = TissueGraph.getCyclesPaton(graph);
+
         System.out.println(vertices.size());
-        graph = TissueGraph.generateRNGraph(vertices);
+    }
+
+    private void convertCyclesToPolygons() {
+        List<Polygon> polygons = new ArrayList<>();
+
+        for (List<Point> cycle : cycles) {
+            if (cycle.size() >= Main.MIN_CYCLE_LENGTH && cycle.size() <= Main.MAX_CYCLE_LENGTH) {
+                Polygon polygon = new Polygon();
+                for (Point point : cycle) {
+                    polygon.addPoint(point.x(), point.y());
+                }
+                polygons.add(polygon);
+            }
+        }
+
+        this.polygons = polygons;
     }
 }

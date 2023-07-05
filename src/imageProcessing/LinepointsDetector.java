@@ -6,7 +6,7 @@ import org.opencv.core.Mat;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@Deprecated
 public class LinepointsDetector {
     private int threshold;
 
