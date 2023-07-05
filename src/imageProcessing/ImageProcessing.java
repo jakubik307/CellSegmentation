@@ -1,25 +1,28 @@
 package imageProcessing;
 
-import graphs.PlaneVertex;
+import graphs.Point;
 import org.opencv.core.Core;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
-import org.opencv.features2d.FastFeatureDetector;
-import org.opencv.features2d.Features2d;
+import org.opencv.features2d.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ImageProcessing {
+    private final static int MAX_LINEPOINTS = 30000;
+    private final static int MAX_KEYPOINTS = 0;
+    private final static double POINT_SPACING = 10;
 
     public static void main(String[] args) {
         generateKeypointsList();
     }
 
-    public static List<PlaneVertex> generateKeypointsList() {
+    public static List<Point> generateKeypointsList() {
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
         // ------------------------ EDGE DETECTION ------------------------
@@ -41,7 +44,7 @@ public class ImageProcessing {
         // ------------------------ LINEPOINTS DETECTION ------------------------
 
         // Create a linepoints detector
-        LinepointsDetector linepointsDetector = new LinepointsDetector(20);
+        LinepointsDetector linepointsDetector = new LinepointsDetector(8);
 
         // Detect linepoints in the image
         MatOfKeyPoint linepoints = new MatOfKeyPoint();
@@ -57,7 +60,7 @@ public class ImageProcessing {
         // ------------------------ KEYPOINTS DETECTION ------------------------
 
         // Create a detector
-        FastFeatureDetector detector = FastFeatureDetector.create();
+        Feature2D detector = AgastFeatureDetector.create();
 
         // Detect keypoints in the image
         MatOfKeyPoint keypoints = new MatOfKeyPoint();
@@ -72,19 +75,37 @@ public class ImageProcessing {
 
         // ------------------------ KEYPOINTS LIST ------------------------
 
-        List<PlaneVertex> vertices = new ArrayList<>();
+        List<Point> vertices = new ArrayList<>();
         List<KeyPoint> keyPointsList = keypoints.toList();
         List<KeyPoint> linepointsList = linepoints.toList();
+        int keyPointsAdded = 0;
+        int linePointsAdded = 0;
 
-        int id = 0;
-
+        Collections.shuffle(keyPointsList);
         for (KeyPoint keyPoint : keyPointsList) {
-            vertices.add(new PlaneVertex(id, (int) keyPoint.pt.x, (int) keyPoint.pt.y));
-            id++;
+            if (keyPointsAdded >= MAX_KEYPOINTS) break;
+            vertices.add(new Point((int) keyPoint.pt.x, (int) keyPoint.pt.y));
+            keyPointsAdded++;
         }
 
+        Collections.shuffle(linepointsList);
         for (KeyPoint linePoint : linepointsList) {
-            vertices.add(new PlaneVertex(id, (int) linePoint.pt.x, (int) linePoint.pt.y));
+            if (linePointsAdded >= MAX_LINEPOINTS) break;
+            vertices.add(new Point((int) linePoint.pt.x, (int) linePoint.pt.y));
+            linePointsAdded++;
+        }
+
+        // Remove points that are too close to each other
+
+        for (int i = 0; i < vertices.size(); i++) {
+            Point point = vertices.get(i);
+            for (int j = i + 1; j < vertices.size(); j++) {
+                Point otherPoint = vertices.get(j);
+                if (point.distanceTo(otherPoint) < POINT_SPACING) {
+                    vertices.remove(j);
+                    j--;
+                }
+            }
         }
 
         return vertices;

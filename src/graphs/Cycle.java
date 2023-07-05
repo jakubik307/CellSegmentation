@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class Cycle {
-    private final List<Vertex> vertices;
+    private final List<Point> vertices;
     private final int size;
 
-    public Cycle(List<Vertex> vertices) {
+    public Cycle(List<Point> vertices) {
         this.vertices = vertices;
         this.size = vertices.size();
     }
 
-    public List<Vertex> getVertices() {
+    public List<Point> getVertices() {
         return vertices;
     }
 
@@ -36,7 +36,7 @@ public class Cycle {
         for (int i = 0; i < vertices.size(); i++) {
             boolean isEqual = true;
             for (int j = 0; j < vertices.size(); j++) {
-                Vertex vertex = vertices.get((i + j) % vertices.size()); // Używamy modulo, aby uzyskać cykliczne permutacje wierzchołków
+                Point vertex = vertices.get((i + j) % vertices.size()); // Używamy modulo, aby uzyskać cykliczne permutacje wierzchołków
                 if (!vertex.equals(other.vertices.get(j))) {
                     isEqual = false;
                     break;
@@ -50,7 +50,7 @@ public class Cycle {
         for (int i = 0; i < vertices.size(); i++) {
             boolean isEqual = true;
             for (int j = 0; j < vertices.size(); j++) {
-                Vertex vertex = vertices.get((i - j + vertices.size()) % vertices.size()); // Używamy modulo, aby uzyskać cykliczne permutacje wierzchołków w odwrotnej kolejności
+                Point vertex = vertices.get((i - j + vertices.size()) % vertices.size()); // Używamy modulo, aby uzyskać cykliczne permutacje wierzchołków w odwrotnej kolejności
                 if (!vertex.equals(other.vertices.get(j))) {
                     isEqual = false;
                     break;

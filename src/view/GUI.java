@@ -1,7 +1,10 @@
 package view;
 
-import graphs.*;
+import graphs.Point;
+import graphs.TissueGraph;
 import imageProcessing.ImageProcessing;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -10,19 +13,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public class GUI extends JFrame {
     public final static int BUTTON_PANEL_HEIGHT = 50;
 
     public static int WIDTH = 600;
     public static int HEIGHT = 700;
-    private PlaneGraph graph;
-    private List<PlaneVertex> vertices;
+    private Graph<Point, DefaultEdge> graph;
+    private List<Point> vertices;
 
     private BufferedImage backgroundImage;
 
     public GUI() {
         generateGraph();
+
         loadBackgroundImage();
         WIDTH = backgroundImage.getWidth();
         HEIGHT = backgroundImage.getHeight();
@@ -52,7 +57,6 @@ public class GUI extends JFrame {
         JButton inputButton = new JButton("Graph on input");
         inputButton.addActionListener(e -> {
             loadBackgroundImage();
-
             repaint();
         });
         buttonPanel.add(inputButton);
@@ -60,16 +64,12 @@ public class GUI extends JFrame {
         JButton edgeButton = new JButton("Graph on edges");
         edgeButton.addActionListener(e -> {
             loadEdgesImage();
-
             repaint();
         });
         buttonPanel.add(edgeButton);
 
         JButton cycleButton = new JButton("List of cycles");
-        cycleButton.addActionListener(e -> {
-            showCycles();
-            graph.findAllCycles();
-        });
+        cycleButton.addActionListener(e -> showCycles());
         buttonPanel.add(cycleButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -87,10 +87,15 @@ public class GUI extends JFrame {
 
         // Tworzenie modelu listy
         DefaultListModel<String> model = new DefaultListModel<>();
-        List<Cycle> cycles = FastCycleDetection.enumerateCycles(graph);
+        List<List<Point>> cycles = TissueGraph.getCyclesPaton(graph);
         model.addElement("Found " + cycles.size() + " cycles");
-        for (Cycle cycle : cycles) {
-            model.addElement(cycle.toString());
+        for (List<Point> list : cycles) {
+            StringBuilder builder = new StringBuilder();
+            for (Point point : list) {
+                builder.append(point.toString());
+                builder.append(" ");
+            }
+            model.addElement(builder.toString());
         }
 
         // Tworzenie listy
@@ -110,9 +115,9 @@ public class GUI extends JFrame {
     private void drawPlaneGraph(Graphics g) {
         int vertexRadius = 2;
 
-        for (PlaneVertex vertex : vertices) {
-            int x = vertex.getX();
-            int y = vertex.getY();
+        for (Point vertex : vertices) {
+            int x = vertex.x();
+            int y = vertex.y();
 
             // Vertex color
             g.setColor(Color.GREEN);
@@ -122,19 +127,17 @@ public class GUI extends JFrame {
 
         // Edge color
         g.setColor(Color.RED);
-        List<Edge> edges = graph.getEdges();
+        Set<DefaultEdge> edges = graph.edgeSet();
 
-        for (Edge edge : edges) {
-            Vertex source = edge.source();
-            Vertex destination = edge.destination();
+        for (DefaultEdge edge : edges) {
+            Point source = graph.getEdgeSource(edge);
+            Point target = graph.getEdgeTarget(edge);
 
-            if (source instanceof PlaneVertex && destination instanceof PlaneVertex) {
-                int x1 = ((PlaneVertex) source).getX();
-                int y1 = ((PlaneVertex) source).getY();
-                int x2 = ((PlaneVertex) destination).getX();
-                int y2 = ((PlaneVertex) destination).getY();
-                g.drawLine(x1, y1, x2, y2);
-            }
+            int x1 = source.x();
+            int y1 = source.y();
+            int x2 = target.x();
+            int y2 = target.y();
+            g.drawLine(x1, y1, x2, y2);
         }
     }
 
@@ -159,7 +162,6 @@ public class GUI extends JFrame {
     private void generateGraph() {
         vertices = ImageProcessing.generateKeypointsList();
         System.out.println(vertices.size());
-        graph = new PlaneGraph(vertices);
-        graph.generateRNGraph();
+        graph = TissueGraph.generateRNGraph(vertices);
     }
 }
