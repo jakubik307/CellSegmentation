@@ -19,5 +19,4 @@ public class Main {
     }
 }
 
-// TODO: 05/07/2023 add low and high quality edges and points
 // AgastFeatureDetector, BRISK, FastFeature,

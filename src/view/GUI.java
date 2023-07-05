@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class GUI extends JFrame {
     public final static int BUTTON_PANEL_HEIGHT = 50;
     public static int WIDTH = 600;
