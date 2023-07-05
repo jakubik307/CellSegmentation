@@ -42,6 +42,27 @@ public class TissueGraph {
         return graph;
     }
 
+    public static List<List<Point>> getCyclesPaton(Graph<Point, DefaultEdge> graph) {
+        Set<List<Point>> allCycles = new HashSet<>();
+        PatonCycleBase<Point, DefaultEdge> cycleBase = new PatonCycleBase<>(graph);
+
+        cycleBase.getCycleBasis().getCycles().forEach(cycle -> {
+            List<Point> currentCycle = new ArrayList<>();
+            cycle.forEach(defaultEdge -> {
+                Point source = graph.getEdgeSource(defaultEdge);
+                Point target = graph.getEdgeTarget(defaultEdge);
+                if (!currentCycle.contains(source)) currentCycle.add(source);
+                if (!currentCycle.contains(target)) currentCycle.add(target);
+            });
+            allCycles.add(currentCycle);
+        });
+
+        List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
+        cycleList.sort((o1, o2) -> o2.size() - o1.size());
+
+        return cycleList;
+    }
+
     public static Graph<Point, DefaultEdge> generateGabrielGraph(List<Point> list) {
         Graph<Point, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         for (Point point : list) {
@@ -106,26 +127,5 @@ public class TissueGraph {
                 currentCycle.remove(neighborVertex);
             }
         }
-    }
-
-    public static List<List<Point>> getCyclesPaton(Graph<Point, DefaultEdge> graph) {
-        Set<List<Point>> allCycles = new HashSet<>();
-        PatonCycleBase<Point, DefaultEdge> cycleBase = new PatonCycleBase<>(graph);
-
-        cycleBase.getCycleBasis().getCycles().forEach(cycle -> {
-            List<Point> currentCycle = new ArrayList<>();
-            cycle.forEach(defaultEdge -> {
-                Point source = graph.getEdgeSource(defaultEdge);
-                Point target = graph.getEdgeTarget(defaultEdge);
-                if (!currentCycle.contains(source)) currentCycle.add(source);
-                if (!currentCycle.contains(target)) currentCycle.add(target);
-            });
-            allCycles.add(currentCycle);
-        });
-
-        List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
-        cycleList.sort((o1, o2) -> o2.size() - o1.size());
-
-        return cycleList;
     }
 }

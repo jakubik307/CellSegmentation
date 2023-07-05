@@ -106,7 +106,7 @@ public class GUI extends JFrame {
             StringBuilder builder = new StringBuilder();
             for (Point point : list) {
                 builder.append(point.toString());
-                builder.append(" ");
+                builder.append(", ");
             }
             model.addElement(builder.toString());
         }
