@@ -93,13 +93,13 @@ public class GUI extends JFrame {
     }
 
     private void showCycles() {
-        // Tworzenie modelu listy
+        // Create cycles window
         JFrame listFrame = new JFrame("Cycle list");
         listFrame.setPreferredSize(new Dimension(500, 500));
         listFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         listFrame.setLocationRelativeTo(null);
 
-        // Tworzenie modelu listy
+        // Create list model
         DefaultListModel<String> model = new DefaultListModel<>();
         model.addElement("Found " + cycles.size() + " cycles");
         for (List<Point> list : cycles) {
@@ -111,16 +111,12 @@ public class GUI extends JFrame {
             model.addElement(builder.toString());
         }
 
-        // Tworzenie listy
+        // Adding components to window
         JList<String> list = new JList<>(model);
-
-        // Dodawanie listy do panelu z paskiem przewijania
         JScrollPane scrollPane = new JScrollPane(list);
-
-        // Dodawanie panelu do okna
         listFrame.getContentPane().add(scrollPane);
 
-        // Ustawianie rozmiaru i wyświetlanie okna
+        // Showing the window
         listFrame.pack();
         listFrame.setVisible(true);
     }
@@ -155,6 +151,7 @@ public class GUI extends JFrame {
     }
 
     private void drawCycle(Graphics g) {
+        // Polygon color
         g.setColor(new Color(66, 117, 245, 150));
         Polygon polygon = polygons.get(cycleIndex % polygons.size());
         g.drawPolygon(polygon);
@@ -183,8 +180,6 @@ public class GUI extends JFrame {
         this.vertices = ImageProcessing.generateKeypointsList();
         this.graph = TissueGraph.generateRNGraph(vertices);
         this.cycles = TissueGraph.getCyclesPaton(graph);
-
-        System.out.println(vertices.size());
     }
 
     private void convertCyclesToPolygons() {

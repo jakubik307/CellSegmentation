@@ -65,6 +65,7 @@ public class ImageProcessing {
         List<KeyPoint> keyPointsList = keypoints.toList();
         int keyPointsAdded = 0;
 
+        // Reduce point number to MAX_KEYPOINTS
         Collections.shuffle(keyPointsList);
         for (KeyPoint keyPoint : keyPointsList) {
             if (keyPointsAdded >= Main.MAX_KEYPOINTS) break;
@@ -73,7 +74,6 @@ public class ImageProcessing {
         }
 
         // Remove points that are too close to each other
-
         for (int i = 0; i < vertices.size(); i++) {
             Point point = vertices.get(i);
             for (int j = i + 1; j < vertices.size(); j++) {
