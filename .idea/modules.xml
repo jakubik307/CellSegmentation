@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Lab_cel.iml" filepath="$PROJECT_DIR$/Lab_cel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CellSegmentation.iml" filepath="$PROJECT_DIR$/CellSegmentation.iml" />
     </modules>
   </component>
 </project>

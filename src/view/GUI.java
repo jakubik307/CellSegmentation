@@ -153,9 +153,11 @@ public class GUI extends JFrame {
     private void drawCycle(Graphics g) {
         // Polygon color
         g.setColor(new Color(66, 117, 245, 150));
-        Polygon polygon = polygons.get(cycleIndex % polygons.size());
-        g.drawPolygon(polygon);
-        g.fillPolygon(polygon);
+        if (polygons.size() != 0) {
+            Polygon polygon = polygons.get(cycleIndex % polygons.size());
+            g.drawPolygon(polygon);
+            g.fillPolygon(polygon);
+        }
     }
 
     private void loadBackgroundImage() {
