@@ -49,18 +49,32 @@ public class TissueGraph {
 
         cycleBase.getCycleBasis().getCycles().forEach(cycle -> {
             List<Point> currentCycle = new ArrayList<>();
+            DefaultEdge startEdge = cycle.get(0);
+            DefaultEdge nextEdge = cycle.get(1);
             cycle.forEach(defaultEdge -> {
-                Point source = graph.getEdgeSource(defaultEdge);
-                Point target = graph.getEdgeTarget(defaultEdge);
-                if (!currentCycle.contains(source)) currentCycle.add(source);
-                if (!currentCycle.contains(target)) currentCycle.add(target);
+                if (defaultEdge.equals(startEdge)) {
+                    if (graph.getEdgeSource(nextEdge).equals(graph.getEdgeSource(startEdge)) || graph.getEdgeTarget(nextEdge).equals(graph.getEdgeSource(startEdge))) {
+                        currentCycle.add(graph.getEdgeSource(startEdge));
+                    } else {
+                        currentCycle.add(graph.getEdgeTarget(startEdge));
+                    }
+                } else {
+                    if (currentCycle.contains(graph.getEdgeSource(defaultEdge))) {
+                        currentCycle.add(graph.getEdgeTarget(defaultEdge));
+                    } else {
+                        currentCycle.add(graph.getEdgeSource(defaultEdge));
+                    }
+                }
+
             });
             allCycles.add(currentCycle);
         });
 
         List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
-        cycleList.sort((o1, o2) -> o2.size() - o1.size());
+        cycleList.sort((o1, o2) -> o1.size() - o2.size());
 
         return cycleList;
     }
+
+
 }

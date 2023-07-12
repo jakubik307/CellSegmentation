@@ -7,11 +7,9 @@ import javax.swing.*;
 public class Main {
 
     // PARAMETERS
-    public static final int MAX_KEYPOINTS = 10_000;
-    public static final int CANNY_THRESHOLD1 = 80;
-    public static final int CANNY_THRESHOLD2 = 180;
-    public static final double POINT_SPACING = 8;
-    public static final int MIN_CYCLE_LENGTH = 10;
+    public static final int CANNY_THRESHOLD1 = 60;
+    public static final int CANNY_THRESHOLD2 = 150;
+    public static final int MIN_CYCLE_LENGTH = 1;
     public static final int MAX_CYCLE_LENGTH = 100;
 
     // MAX_KEYPOINTS set on 10_000 does not reduce number of generated points

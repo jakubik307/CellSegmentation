@@ -108,6 +108,7 @@ public class GUI extends JFrame {
                 builder.append(point.toString());
                 builder.append(", ");
             }
+            builder.setCharAt(builder.length() - 2, ' ');
             model.addElement(builder.toString());
         }
 

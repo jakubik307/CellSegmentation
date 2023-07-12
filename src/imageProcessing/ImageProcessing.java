@@ -6,14 +6,13 @@ import org.opencv.core.Core;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
-import org.opencv.features2d.AgastFeatureDetector;
 import org.opencv.features2d.Feature2D;
 import org.opencv.features2d.Features2d;
+import org.opencv.features2d.SIFT;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ImageProcessing {
@@ -46,44 +45,46 @@ public class ImageProcessing {
         // ------------------------ KEYPOINTS DETECTION ------------------------
 
         // Create a detector
-        Feature2D detector = AgastFeatureDetector.create();
+        Feature2D detector = SIFT.create(0, 3, 0.04, 10, 1.6);
 
         // Detect keypoints in the image
-        MatOfKeyPoint keypoints = new MatOfKeyPoint();
-        detector.detect(edges, keypoints);
+        MatOfKeyPoint allKeypoints = new MatOfKeyPoint();
+        detector.detect(input, allKeypoints);
 
         // Draw keypoints on the image
         Mat outputImage = new Mat();
-        Features2d.drawKeypoints(edges, keypoints, outputImage);
+        Features2d.drawKeypoints(edges, allKeypoints, outputImage);
 
         // Save the marked keypoints image
-        Imgcodecs.imwrite("img/keypoints.png", outputImage);
+        Imgcodecs.imwrite("img/allKeypoints.png", outputImage);
 
         // ------------------------ KEYPOINTS LIST ------------------------
 
         List<Point> vertices = new ArrayList<>();
-        List<KeyPoint> keyPointsList = keypoints.toList();
-        int keyPointsAdded = 0;
+        List<KeyPoint> keyPointsList = allKeypoints.toList();
+        List<KeyPoint> validKeyPointsList = new ArrayList<>();
+        MatOfKeyPoint validKeyPoints = new MatOfKeyPoint();
 
-        // Reduce point number to MAX_KEYPOINTS
-        Collections.shuffle(keyPointsList);
+        // Get the vertices from the keypoints
         for (KeyPoint keyPoint : keyPointsList) {
-            if (keyPointsAdded >= Main.MAX_KEYPOINTS) break;
-            vertices.add(new Point((int) keyPoint.pt.x, (int) keyPoint.pt.y));
-            keyPointsAdded++;
-        }
-
-        // Remove points that are too close to each other
-        for (int i = 0; i < vertices.size(); i++) {
-            Point point = vertices.get(i);
-            for (int j = i + 1; j < vertices.size(); j++) {
-                Point otherPoint = vertices.get(j);
-                if (point.distanceTo(otherPoint) < Main.POINT_SPACING) {
-                    vertices.remove(j);
-                    j--;
+            if (edges.get((int) keyPoint.pt.y, (int) keyPoint.pt.x)[0] == 255) {
+                Point point = new Point((int) keyPoint.pt.x, (int) keyPoint.pt.y);
+                if (!vertices.contains(point)) {
+                    validKeyPointsList.add(keyPoint);
+                    vertices.add(point);
                 }
             }
         }
+
+        System.out.println("Number of vertices: " + vertices.size());
+        validKeyPoints.fromList(validKeyPointsList);
+
+        // Draw keypoints on the image
+        Mat validKeypoints = new Mat();
+        Features2d.drawKeypoints(edges, validKeyPoints, validKeypoints);
+
+        // Save the marked keypoints image
+        Imgcodecs.imwrite("img/keypoints.png", validKeypoints);
 
         return vertices;
     }
