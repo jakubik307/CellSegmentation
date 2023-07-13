@@ -21,7 +21,7 @@ Please make sure to install the above libraries before running the program.
 
 ## Examples
 
-Sample images are provided in the `images/HER2` folder. The following images are an example of the program's output:
+Sample images are provided in the `img/HER2` folder. The following images are an example of the program's output:
 
 ![Example output](img/screenshot.png)
 
