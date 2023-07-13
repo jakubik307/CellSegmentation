@@ -19,9 +19,9 @@ Please make sure to install the above libraries before running the program.
 5. The obtained points will be used to construct a graph following the rules of the Relative Neighborhood Graph.
 6. Finally, the program will perform region detection by traversing all edges in both clockwise and counterclockwise directions to generate a set of all graph regions, approximating the cells present in the image.
 
-## Examples
+## Example
 
-Sample images are provided in the `images/HER2` folder. The following images are an example of the program's output:
+Sample images are provided in the `images/HER2` folder. The following image is an example of the program's output:
 
 ![Example output](img/screenshot.png)
 
