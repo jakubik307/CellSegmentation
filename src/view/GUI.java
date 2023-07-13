@@ -182,7 +182,7 @@ public class GUI extends JFrame {
     private void generateGraph() {
         this.vertices = ImageProcessing.generateKeypointsList();
         this.graph = TissueGraph.generateRNGraph(vertices);
-        this.cycles = TissueGraph.getCyclesPaton(graph);
+        this.cycles = TissueGraph.getCycles(graph);
     }
 
     private void convertCyclesToPolygons() {

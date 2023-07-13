@@ -5,10 +5,7 @@ import org.jgrapht.alg.cycle.PatonCycleBase;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TissueGraph {
     public static Graph<Point, DefaultEdge> generateRNGraph(List<Point> list) {
@@ -43,6 +40,7 @@ public class TissueGraph {
         return graph;
     }
 
+    @SuppressWarnings("unused")
     public static List<List<Point>> getCyclesPaton(Graph<Point, DefaultEdge> graph) {
         Set<List<Point>> allCycles = new HashSet<>();
         PatonCycleBase<Point, DefaultEdge> cycleBase = new PatonCycleBase<>(graph);
@@ -71,10 +69,73 @@ public class TissueGraph {
         });
 
         List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
-        cycleList.sort((o1, o2) -> o1.size() - o2.size());
+        cycleList.sort(Comparator.comparingInt(List::size));
 
         return cycleList;
     }
 
+    public static List<List<Point>> getCycles(Graph<Point, DefaultEdge> graph) {
+        Set<List<Point>> allCycles = new HashSet<>();
+        List<DefaultEdge> edges = new ArrayList<>(graph.edgeSet());
+        Map<Point, List<Point>> clockwiseGraph = new HashMap<>();
 
+        graph.vertexSet().forEach(point -> {
+            clockwiseGraph.put(point, new ArrayList<>());
+            graph.outgoingEdgesOf(point).forEach(defaultEdge -> {
+                if (graph.getEdgeSource(defaultEdge).equals(point)) {
+                    clockwiseGraph.get(point).add(graph.getEdgeTarget(defaultEdge));
+                } else {
+                    clockwiseGraph.get(point).add(graph.getEdgeSource(defaultEdge));
+                }
+            });
+            clockwiseGraph.get(point).sort(new ClockwiseComparator(point));
+        });
+
+        for (DefaultEdge edge : edges) {
+            allCycles.add(getClockwiseCycle(clockwiseGraph, graph.getEdgeSource(edge), graph.getEdgeTarget(edge)));
+            allCycles.add(getClockwiseCycle(clockwiseGraph, graph.getEdgeTarget(edge), graph.getEdgeSource(edge)));
+        }
+
+        // Remove cycles with less than 3 points
+        allCycles.removeIf(Objects::isNull);
+        allCycles.removeIf(cycle -> cycle.size() < 3);
+
+        // Remove cycles permutations
+        List<List<Point>> allCyclesList = new ArrayList<>(allCycles);
+        for (int i = 0; i < allCyclesList.size(); i++) {
+            for (int j = allCyclesList.size() - 1; j >= 0; j--) {
+                if (i != j && new HashSet<>(allCyclesList.get(i)).containsAll(allCyclesList.get(j))) {
+                    allCyclesList.remove(j);
+                }
+            }
+        }
+
+        return allCyclesList;
+    }
+
+    private static List<Point> getClockwiseCycle(Map<Point, List<Point>> graph, Point start, Point next) {
+        List<Point> cycle = new ArrayList<>();
+        Set<Point> visited = new HashSet<>();
+
+        cycle.add(start);
+        visited.add(start);
+
+        cycle.add(next);
+        visited.add(next);
+
+        Point prev = start;
+        Point current = next;
+
+        while (true) {
+            int pos = (graph.get(current).indexOf(prev) + 1) % graph.get(current).size();
+            prev = current;
+            current = graph.get(current).get(pos);
+            if (current.equals(start)) break;
+            if (visited.contains(current)) return null;
+            cycle.add(current);
+            visited.add(current);
+        }
+
+        return cycle;
+    }
 }

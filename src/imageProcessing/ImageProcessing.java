@@ -45,7 +45,7 @@ public class ImageProcessing {
         // ------------------------ KEYPOINTS DETECTION ------------------------
 
         // Create a detector
-        Feature2D detector = SIFT.create(0, 3, 0.04, 10, 1.6);
+        Feature2D detector = SIFT.create(0, 3, 0.01, 10, 1.6);
 
         // Detect keypoints in the image
         MatOfKeyPoint allKeypoints = new MatOfKeyPoint();
