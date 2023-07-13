@@ -1,7 +1,6 @@
 package graphs;
 
 import org.jgrapht.Graph;
-import org.jgrapht.alg.cycle.PatonCycleBase;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
@@ -40,40 +39,6 @@ public class TissueGraph {
         return graph;
     }
 
-    @SuppressWarnings("unused")
-    public static List<List<Point>> getCyclesPaton(Graph<Point, DefaultEdge> graph) {
-        Set<List<Point>> allCycles = new HashSet<>();
-        PatonCycleBase<Point, DefaultEdge> cycleBase = new PatonCycleBase<>(graph);
-
-        cycleBase.getCycleBasis().getCycles().forEach(cycle -> {
-            List<Point> currentCycle = new ArrayList<>();
-            DefaultEdge startEdge = cycle.get(0);
-            DefaultEdge nextEdge = cycle.get(1);
-            cycle.forEach(defaultEdge -> {
-                if (defaultEdge.equals(startEdge)) {
-                    if (graph.getEdgeSource(nextEdge).equals(graph.getEdgeSource(startEdge)) || graph.getEdgeTarget(nextEdge).equals(graph.getEdgeSource(startEdge))) {
-                        currentCycle.add(graph.getEdgeSource(startEdge));
-                    } else {
-                        currentCycle.add(graph.getEdgeTarget(startEdge));
-                    }
-                } else {
-                    if (currentCycle.contains(graph.getEdgeSource(defaultEdge))) {
-                        currentCycle.add(graph.getEdgeTarget(defaultEdge));
-                    } else {
-                        currentCycle.add(graph.getEdgeSource(defaultEdge));
-                    }
-                }
-
-            });
-            allCycles.add(currentCycle);
-        });
-
-        List<List<Point>> cycleList = new ArrayList<>(allCycles.stream().toList());
-        cycleList.sort(Comparator.comparingInt(List::size));
-
-        return cycleList;
-    }
-
     public static List<List<Point>> getCycles(Graph<Point, DefaultEdge> graph) {
         Set<List<Point>> allCycles = new HashSet<>();
         List<DefaultEdge> edges = new ArrayList<>(graph.edgeSet());
@@ -96,15 +61,20 @@ public class TissueGraph {
             allCycles.add(getClockwiseCycle(clockwiseGraph, graph.getEdgeTarget(edge), graph.getEdgeSource(edge)));
         }
 
-        // Remove cycles with less than 3 points
+        // Remove cycles with less than 3 points and invalid cycles
         allCycles.removeIf(Objects::isNull);
         allCycles.removeIf(cycle -> cycle.size() < 3);
 
         // Remove cycles permutations
         List<List<Point>> allCyclesList = new ArrayList<>(allCycles);
+
         for (int i = 0; i < allCyclesList.size(); i++) {
-            for (int j = allCyclesList.size() - 1; j >= 0; j--) {
-                if (i != j && new HashSet<>(allCyclesList.get(i)).containsAll(allCyclesList.get(j))) {
+            List<Point> cycleI = allCyclesList.get(i);
+
+            for (int j = allCyclesList.size() - 1; j > i; j--) {
+                List<Point> cycleJ = allCyclesList.get(j);
+
+                if (new HashSet<>(cycleI).containsAll(cycleJ)) {
                     allCyclesList.remove(j);
                 }
             }

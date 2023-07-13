@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class GUI extends JFrame {
     public final static int BUTTON_PANEL_HEIGHT = 50;
     public static int WIDTH = 600;
@@ -92,34 +91,28 @@ public class GUI extends JFrame {
         setVisible(true);
     }
 
-    private void showCycles() {
-        // Create cycles window
-        JFrame listFrame = new JFrame("Cycle list");
-        listFrame.setPreferredSize(new Dimension(500, 500));
-        listFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        listFrame.setLocationRelativeTo(null);
-
-        // Create list model
-        DefaultListModel<String> model = new DefaultListModel<>();
-        model.addElement("Found " + cycles.size() + " cycles");
-        for (List<Point> list : cycles) {
-            StringBuilder builder = new StringBuilder();
-            for (Point point : list) {
-                builder.append(point.toString());
-                builder.append(", ");
-            }
-            builder.setCharAt(builder.length() - 2, ' ');
-            model.addElement(builder.toString());
+    private void loadBackgroundImage() {
+        try {
+            File imageFile = new File("img/input.png");
+            backgroundImage = ImageIO.read(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
 
-        // Adding components to window
-        JList<String> list = new JList<>(model);
-        JScrollPane scrollPane = new JScrollPane(list);
-        listFrame.getContentPane().add(scrollPane);
+    private void loadEdgesImage() {
+        try {
+            File imageFile = new File("img/edges.png");
+            backgroundImage = ImageIO.read(imageFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        // Showing the window
-        listFrame.pack();
-        listFrame.setVisible(true);
+    private void generateGraph() {
+        this.vertices = ImageProcessing.generateKeypointsList();
+        this.graph = TissueGraph.generateRNGraph(vertices);
+        this.cycles = TissueGraph.getCycles(graph);
     }
 
     private void drawPlaneGraph(Graphics g) {
@@ -151,6 +144,50 @@ public class GUI extends JFrame {
         }
     }
 
+    private void showCycles() {
+        // Create cycles window
+        JFrame listFrame = new JFrame("Cycle list");
+        listFrame.setPreferredSize(new Dimension(500, 500));
+        listFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        listFrame.setLocationRelativeTo(null);
+
+        // Create list model
+        DefaultListModel<String> model = new DefaultListModel<>();
+        model.addElement("Found " + cycles.size() + " cycles");
+        for (List<Point> list : cycles) {
+            StringBuilder builder = new StringBuilder();
+            for (Point point : list) {
+                builder.append(point.toString());
+                builder.append(", ");
+            }
+            builder.setCharAt(builder.length() - 2, ' ');
+            model.addElement(builder.toString());
+        }
+
+        // Adding components to window
+        JList<String> list = new JList<>(model);
+        JScrollPane scrollPane = new JScrollPane(list);
+        listFrame.getContentPane().add(scrollPane);
+
+        // Showing the window
+        listFrame.pack();
+        listFrame.setVisible(true);
+    }
+
+    private void convertCyclesToPolygons() {
+        List<Polygon> polygons = new ArrayList<>();
+
+        for (List<Point> cycle : cycles) {
+            Polygon polygon = new Polygon();
+            for (Point point : cycle) polygon.addPoint(point.x(), point.y());
+            if (polygon.getBounds().getWidth() * polygon.getBounds().getHeight() >= Main.MIN_CYCLE_AREA) {
+                polygons.add(polygon);
+            }
+        }
+
+        this.polygons = polygons;
+    }
+
     private void drawCycle(Graphics g) {
         // Polygon color
         g.setColor(new Color(66, 117, 245, 150));
@@ -159,45 +196,5 @@ public class GUI extends JFrame {
             g.drawPolygon(polygon);
             g.fillPolygon(polygon);
         }
-    }
-
-    private void loadBackgroundImage() {
-        try {
-            File imageFile = new File("img/input.png");
-            backgroundImage = ImageIO.read(imageFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadEdgesImage() {
-        try {
-            File imageFile = new File("img/edges.png");
-            backgroundImage = ImageIO.read(imageFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void generateGraph() {
-        this.vertices = ImageProcessing.generateKeypointsList();
-        this.graph = TissueGraph.generateRNGraph(vertices);
-        this.cycles = TissueGraph.getCycles(graph);
-    }
-
-    private void convertCyclesToPolygons() {
-        List<Polygon> polygons = new ArrayList<>();
-
-        for (List<Point> cycle : cycles) {
-            if (cycle.size() >= Main.MIN_CYCLE_LENGTH && cycle.size() <= Main.MAX_CYCLE_LENGTH) {
-                Polygon polygon = new Polygon();
-                for (Point point : cycle) {
-                    polygon.addPoint(point.x(), point.y());
-                }
-                polygons.add(polygon);
-            }
-        }
-
-        this.polygons = polygons;
     }
 }

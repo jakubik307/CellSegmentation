@@ -6,9 +6,7 @@ import org.opencv.core.Core;
 import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfKeyPoint;
-import org.opencv.features2d.Feature2D;
-import org.opencv.features2d.Features2d;
-import org.opencv.features2d.SIFT;
+import org.opencv.features2d.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -45,7 +43,7 @@ public class ImageProcessing {
         // ------------------------ KEYPOINTS DETECTION ------------------------
 
         // Create a detector
-        Feature2D detector = SIFT.create(0, 3, 0.01, 10, 1.6);
+        Feature2D detector = AgastFeatureDetector.create();
 
         // Detect keypoints in the image
         MatOfKeyPoint allKeypoints = new MatOfKeyPoint();
